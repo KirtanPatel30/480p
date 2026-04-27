@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>⭐ Movie Recommendations</h1>
+<p style="color:#555;margin-bottom:20px">Based on your interests, our AI recommends these movies currently showing.</p>
+
+<div class="card">
+  <h2>Update Your Interests</h2>
+  <form method="POST" action="{{ url_for('update_interests') }}">
+    <label>Describe the kinds of movies you enjoy</label>
+    <textarea name="interests" rows="3" placeholder="e.g. I love sci-fi action movies with great special effects and strong female leads" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:0.9rem;margin-bottom:12px">{{ session.get('interests','') }}</textarea>
+    <button class="btn" type="submit">Save &amp; Get Recommendations</button>
+  </form>
+</div>
+
+{% if has_interests %}
+  {% if recs %}
+  <h2>Your Top Picks</h2>
+  <table>
+    <thead>
+      <tr><th>Rank</th><th>Movie</th><th>Language</th><th>Description</th><th>Match Score</th></tr>
+    </thead>
+    <tbody>
+      {% for r in recs %}
+      <tr>
+        <td style="font-size:1.4rem">
+          {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
+        </td>
+        <td><strong>{{ r[1] }}</strong></td>
+        <td>{{ r[3] }}</td>
+        <td>{{ r[2] or '–' }}</td>
+        <td><span class="tag green">{{ "%.0f"|format(r[4]*100) }}%</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p style="font-size:0.82rem;color:#888;margin-top:12px">
+    Recommendations use semantic similarity between your interests and movie descriptions (RAG system with sentence embeddings).
+  </p>
+  {% else %}
+  <div class="card">
+    <p>No recommendations yet — ask your admin to run the embedding step, then come back!</p>
+  </div>
+  {% endif %}
+{% else %}
+<div class="card">
+  <p>Enter your movie interests above to get personalized recommendations.</p>
+</div>
+{% endif %}
+{% endblock %}

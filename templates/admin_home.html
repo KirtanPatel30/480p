@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero">
+  <h1>Admin Dashboard</h1>
+  <p>Manage screenings and view sales analytics.</p>
+  <div class="hero-btns">
+    <a class="btn" href="{{ url_for('admin_screenings') }}">Manage Screenings</a>
+    <a class="btn gray" href="{{ url_for('admin_analytics') }}">View Analytics</a>
+  </div>
+</div>
+{% endblock %}

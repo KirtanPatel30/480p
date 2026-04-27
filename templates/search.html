@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Search Screenings</h1>
+
+<form class="filters" method="GET">
+  <div>
+    <label>Movie Title</label>
+    <input type="text" name="title" value="{{ title }}">
+  </div>
+  <div>
+    <label>Date</label>
+    <input type="date" name="date" value="{{ date }}">
+  </div>
+  <div>
+    <label>After Time</label>
+    <input type="time" name="after_time" value="{{ after }}">
+  </div>
+  <div>
+    <label>3D</label>
+    <select name="is_3d">
+      <option value="">Any</option>
+      <option value="1" {% if is_3d=='1' %}selected{% endif %}>3D Only</option>
+    </select>
+  </div>
+  <div>
+    <label>Fancy Sound</label>
+    <select name="fancy">
+      <option value="">Any</option>
+      <option value="1" {% if fancy=='1' %}selected{% endif %}>Yes</option>
+    </select>
+  </div>
+  <div style="padding-top:18px">
+    <button class="btn" type="submit">Search</button>
+  </div>
+</form>
+
+{% if rows %}
+<table>
+  <thead>
+    <tr>
+      <th>Movie</th><th>Director(s)</th><th>Cast</th><th>Language</th><th>Length</th>
+      <th>Date</th><th>Time</th><th>Theater</th><th>3D</th><th>Sound</th>
+      <th>Price</th><th>Seats Left</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td><strong>{{ r.title }}</strong>{% if r.major_studio %} <span class="tag blue">Studio</span>{% endif %}</td>
+      <td>{{ r.directors or '–' }}</td>
+      <td>{{ r.actors or '–' }}</td>
+      <td>{{ r.original_language }}</td>
+      <td>{{ r.length_min }} min</td>
+      <td>{{ r.screening_date }}</td>
+      <td>{{ r.start_time }} – {{ r.end_time }}</td>
+      <td>{{ r.theater_name }}</td>
+      <td>{% if r.is_3d %}<span class="tag blue">3D</span>{% else %}–{% endif %}</td>
+      <td>{% if r.has_fancy_sound %}<span class="tag green">✓</span>{% else %}–{% endif %}</td>
+      <td>${{ "%.2f"|format(r.price) }}</td>
+      <td>
+        {% if r.seats_left > 0 %}
+          <span class="tag green">{{ r.seats_left }}</span>
+        {% else %}
+          <span class="tag red">Full</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if r.seats_left > 0 %}
+          <a class="btn sm" href="{{ url_for('book', sid=r.screening_id) }}">Book</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card"><p>No screenings found. Try different filters.</p></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Manage Screenings</h1>
+
+<div class="card">
+  <h2>Add Screening</h2>
+  <form method="POST" action="{{ url_for('admin_add_screening') }}">
+    <label>Movie</label>
+    <select name="movie_id" required>
+      {% for m in movies %}<option value="{{ m.movie_id }}">{{ m.title }}</option>{% endfor %}
+    </select>
+    <label>Theater</label>
+    <select name="theater_id" required>
+      {% for t in theaters %}<option value="{{ t.theater_id }}">{{ t.theater_name }}</option>{% endfor %}
+    </select>
+    <label>Date</label>
+    <input type="date" name="date" required>
+    <label>Start Time</label>
+    <input type="time" name="start_time" required>
+    <label>End Time</label>
+    <input type="time" name="end_time" required>
+    <button class="btn" type="submit">Add Screening</button>
+  </form>
+</div>
+
+<h2>All Screenings</h2>
+<table>
+  <thead>
+    <tr><th>ID</th><th>Movie</th><th>Theater</th><th>Date</th><th>Start</th><th>End</th><th>Sold</th><th>Remaining</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for s in screenings %}
+    <tr>
+      <td>{{ s.screening_id }}</td>
+      <td>{{ s.title }}</td>
+      <td>{{ s.theater_name }}</td>
+      <td>{{ s.screening_date }}</td>
+      <td>{{ s.start_time }}</td>
+      <td>{{ s.end_time }}</td>
+      <td>{{ s.sold }}</td>
+      <td>
+        {% if s.remaining > 0 %}
+          <span class="tag green">{{ s.remaining }}</span>
+        {% else %}
+          <span class="tag red">Full</span>
+        {% endif %}
+      </td>
+      <td>
+        <form method="POST" action="{{ url_for('admin_delete_screening') }}" onsubmit="return confirm('Delete?')">
+          <input type="hidden" name="sid" value="{{ s.screening_id }}">
+          <button class="btn sm gray" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

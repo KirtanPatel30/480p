@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero">
+  <h1>Welcome to CinemaCS480</h1>
+  <p>Search for movies and book tickets online.</p>
+  <div class="hero-btns">
+    <a class="btn" href="{{ url_for('search') }}">Browse Screenings</a>
+    <a class="btn gray" href="{{ url_for('payments') }}">My Payment Methods</a>
+  </div>
+</div>
+{% endblock %}

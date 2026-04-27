@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:440px;margin:0 auto">
+  <h1>Register — Client</h1>
+  <form method="POST">
+    <label>Full Name</label>
+    <input type="text" name="full_name" required>
+    <label>Email</label>
+    <input type="email" name="email" required>
+    <label>Password</label>
+    <input type="password" name="password" required>
+    <label>Address</label>
+    <input type="text" name="address" required>
+    <label>Movie Interests (optional)</label>
+    <input type="text" name="movie_interests" placeholder="e.g. Action, Drama">
+    <label>
+      <input type="checkbox" name="reward_signup"> Sign up for rewards (free ticket every 10 movies)
+    </label>
+    <br>
+    <button class="btn" type="submit">Create Account</button>
+  </form>
+  <p style="margin-top:14px;font-size:0.88rem"><a href="{{ url_for('login') }}">Back to login</a></p>
+</div>
+{% endblock %}

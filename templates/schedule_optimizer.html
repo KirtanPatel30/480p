@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>🤖 AI Schedule Optimizer</h1>
+<p style="color:#555;margin-bottom:20px">
+  Uses a Random Forest ML model trained on past ticket sales to predict occupancy
+  and generate the optimal movie schedule for the next 7 days.
+</p>
+
+{% if sale_count < 3 %}
+<div class="card">
+  <p style="color:#c0392b">
+    <strong>Not enough sales data yet.</strong> The model needs at least 3 ticket sales to train.
+    Currently have {{ sale_count }} sale(s). Book some tickets first, then come back.
+  </p>
+</div>
+{% else %}
+
+{% if model_trained %}
+<div class="card" style="background:#d4edda;border:1px solid #c3e6cb">
+  <p style="color:#155724">
+    ✅ Model trained on {{ sale_count }} past sales. Showing optimal schedule for the next 7 days.
+  </p>
+</div>
+
+{% if schedule %}
+<h2>Recommended Schedule</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Date</th><th>Time</th><th>Movie</th><th>Theater</th>
+      <th>Predicted Tickets</th><th>Capacity</th><th>Price</th><th>Predicted Revenue</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in schedule %}
+    <tr>
+      <td>{{ s.date }}</td>
+      <td>{{ s.slot }}</td>
+      <td>{{ s.movie_title }}</td>
+      <td>{{ s.theater_name }}</td>
+      <td>{{ s.predicted_tickets }}</td>
+      <td>{{ s.max_occupancy }}</td>
+      <td>${{ "%.2f"|format(s.price) }}</td>
+      <td><strong>${{ "%.2f"|format(s.predicted_revenue) }}</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p style="font-size:0.82rem;color:#888;margin-top:12px">
+  The optimizer assigns movies to theaters and time slots to maximize predicted revenue.
+  Predictions use features like day of week, time of day, movie age, studio type, and theater features.
+</p>
+{% endif %}
+{% endif %}
+{% endif %}
+
+<div class="card" style="margin-top:24px">
+  <h2>Embed Movie Descriptions</h2>
+  <p style="font-size:0.88rem;color:#555;margin-bottom:12px">
+    Run this once to generate semantic embeddings for all movies. Required for the client recommendation system.
+  </p>
+  <form method="POST" action="{{ url_for('embed_movies') }}">
+    <button class="btn" type="submit">Generate Movie Embeddings</button>
+  </form>
+</div>
+{% endblock %}

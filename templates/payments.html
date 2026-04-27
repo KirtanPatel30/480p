@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Payment Methods</h1>
+
+<div class="card">
+  <h2>Add a Card</h2>
+  <form method="POST" action="{{ url_for('add_payment') }}">
+    <label>Card Type</label>
+    <select name="payment_type" id="ptype" onchange="toggleBilling()">
+      <option value="credit">Credit Card</option>
+      <option value="debit">Debit Card</option>
+    </select>
+    <label>Cardholder Name</label>
+    <input type="text" name="cardholder_name" required>
+    <label>Card Number</label>
+    <input type="text" name="card_number" maxlength="25" required>
+    <div id="billing">
+      <label>Billing Address (required for credit)</label>
+      <input type="text" name="billing_address" id="billing_input">
+    </div>
+    <label>Expiration Month</label>
+    <input type="number" name="exp_month" min="1" max="12" required>
+    <label>Expiration Year</label>
+    <input type="number" name="exp_year" min="2026" required>
+    <button class="btn" type="submit">Add Card</button>
+  </form>
+</div>
+
+{% if cards %}
+<h2>Saved Cards</h2>
+<table>
+  <thead>
+    <tr><th>Type</th><th>Cardholder</th><th>Card</th><th>Expires</th><th>Billing</th><th colspan="2"></th></tr>
+  </thead>
+  <tbody>
+    {% for c in cards %}
+    <tr>
+      <td>
+        <span class="tag {% if c.payment_type=='credit' %}blue{% else %}green{% endif %}">
+          {{ c.payment_type|capitalize }}
+        </span>
+      </td>
+      <td>{{ c.cardholder_name }}</td>
+      <td>**** {{ c.card_number[-4:] }}</td>
+      <td>{{ c.expiration_month }}/{{ c.expiration_year }}</td>
+      <td>{{ c.billing_address or '–' }}</td>
+      <td>
+        <button class="btn sm" onclick="showEdit({{ c.payment_method_id }})">Edit</button>
+      </td>
+      <td>
+        <form method="POST" action="{{ url_for('delete_payment') }}" onsubmit="return confirm('Delete this card?')">
+          <input type="hidden" name="pmid" value="{{ c.payment_method_id }}">
+          <button class="btn sm gray" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <tr id="edit-{{ c.payment_method_id }}" style="display:none;background:#f9f9f9">
+      <td colspan="7">
+        <form method="POST" action="{{ url_for('update_payment') }}" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0;align-items:flex-end">
+          <input type="hidden" name="pmid" value="{{ c.payment_method_id }}">
+          <div>
+            <label>Type</label>
+            <select name="payment_type">
+              <option value="credit" {% if c.payment_type=='credit' %}selected{% endif %}>Credit</option>
+              <option value="debit"  {% if c.payment_type=='debit'  %}selected{% endif %}>Debit</option>
+            </select>
+          </div>
+          <div>
+            <label>Name</label>
+            <input type="text" name="cardholder_name" value="{{ c.cardholder_name }}" required>
+          </div>
+          <div>
+            <label>Card Number</label>
+            <input type="text" name="card_number" value="{{ c.card_number }}" maxlength="25" required>
+          </div>
+          <div>
+            <label>Billing Address</label>
+            <input type="text" name="billing_address" value="{{ c.billing_address or '' }}">
+          </div>
+          <div>
+            <label>Exp Month</label>
+            <input type="number" name="exp_month" value="{{ c.expiration_month }}" min="1" max="12" required style="width:80px">
+          </div>
+          <div>
+            <label>Exp Year</label>
+            <input type="number" name="exp_year" value="{{ c.expiration_year }}" min="2026" required style="width:90px">
+          </div>
+          <div style="padding-top:18px">
+            <button class="btn sm" type="submit">Save</button>
+            <button class="btn sm gray" type="button" onclick="hideEdit({{ c.payment_method_id }})">Cancel</button>
+          </div>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card"><p>No cards saved yet.</p></div>
+{% endif %}
+
+<script>
+function toggleBilling() {
+  var t = document.getElementById('ptype').value;
+  document.getElementById('billing').style.display = t === 'credit' ? 'block' : 'none';
+  document.getElementById('billing_input').required = t === 'credit';
+}
+function showEdit(id) { document.getElementById('edit-' + id).style.display = 'table-row'; }
+function hideEdit(id) { document.getElementById('edit-' + id).style.display = 'none'; }
+toggleBilling();
+</script>
+{% endblock %}

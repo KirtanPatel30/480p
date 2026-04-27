@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Book Tickets</h1>
+{% if s %}
+<div class="card">
+  <h2>{{ s.title }}</h2>
+  <p>
+    <strong>Theater:</strong> {{ s.theater_name }}
+    {% if s.is_3d %}<span class="tag blue" style="margin-left:6px">3D</span>{% endif %}
+    {% if s.has_fancy_sound %}<span class="tag green" style="margin-left:4px">Fancy Sound</span>{% endif %}
+  </p>
+  <p style="margin-top:8px"><strong>Date:</strong> {{ s.screening_date }} &nbsp; <strong>Starts:</strong> {{ s.start_time }}</p>
+  <p style="margin-top:8px"><strong>Price per ticket:</strong> ${{ "%.2f"|format(s.price) }}</p>
+  <p style="margin-top:4px"><strong>Seats available:</strong> {{ s.seats_left }}</p>
+</div>
+
+<div class="card">
+  <form method="POST">
+    <input type="hidden" name="sid" value="{{ s.screening_id }}">
+    <label>Number of Tickets (max {{ s.seats_left }})</label>
+    <input type="number" name="qty" min="1" max="{{ s.seats_left }}" required>
+    <label>Payment Method</label>
+    <select name="pmid">
+      <option value="">— Anonymous Purchase —</option>
+      {% for c in cards %}
+        <option value="{{ c.payment_method_id }}">
+          {{ c.payment_type|capitalize }} **** {{ c.card_number[-4:] }} ({{ c.cardholder_name }})
+        </option>
+      {% endfor %}
+    </select>
+    <p style="font-size:0.82rem;color:#888;margin-bottom:12px">
+      Leave blank to purchase anonymously (no reward points).
+    </p>
+    <button class="btn" type="submit">Confirm Booking</button>
+    <a class="btn gray" href="{{ url_for('search') }}" style="margin-left:8px">Cancel</a>
+  </form>
+</div>
+{% else %}
+<div class="card"><p>Screening not found.</p></div>
+{% endif %}
+{% endblock %}
